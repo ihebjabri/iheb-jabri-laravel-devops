@@ -43,6 +43,7 @@ jobs:
             --exclude=node_modules/ \
             --exclude=public/storage \
             --exclude=storage/ \
+            -e "ssh -p 222" \
             ./ root@51.210.107.188:/home/test.tunalgo.com/public_html
 
       - name: Install Dependencies on Server
