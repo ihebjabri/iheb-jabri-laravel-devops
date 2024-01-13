@@ -1,3 +1,10 @@
+name: Laravel Deployment
+
+on:
+  push:
+    branches:
+      - master
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -20,30 +27,35 @@ jobs:
       - name: Generate Application Key
         run: php artisan key:generate
 
-      - name: Deploy to Server
-        if: github.ref == 'refs/heads/main'
+      - name: Directory Permissions
+        run: chmod -R 777 storage bootstrap/cache
+
+      - name: Create Database
         run: |
+          mkdir -p database
+          touch database/database.sqlite
+
+      - name: Deploy to Server
+        run: |
+          echo "Using password for authentication"
           rsync -az --delete \
             --exclude=vendor/ \
             --exclude=node_modules/ \
             --exclude=public/storage \
             --exclude=storage/ \
-            ./ user@51.210.107.188:/home/test.tunalgo.com/public_html
+            ./ root@51.210.107.188:/home/test.tunalgo.com/public_html
 
       - name: Install Dependencies on Server
-        if: github.ref == 'refs/heads/main'
         run: |
           echo "Using password for authentication"
-          sshpass -p ${{ secrets.SERVER_PASSWORD }} ssh user@51.210.107.188 "cd /home/test.tunalgo.com/public_html && composer install --no-dev --prefer-dist --optimize-autoloader"
+          sshpass -p ${{ secrets.SERVER_PASSWORD }} ssh root@51.210.107.188 "cd /home/test.tunalgo.com/public_html && composer install --no-dev --prefer-dist --optimize-autoloader"
 
       - name: Migrate Database on Server
-        if: github.ref == 'refs/heads/main'
         run: |
           echo "Using password for authentication"
-          sshpass -p ${{ secrets.SERVER_PASSWORD }} ssh user@51.210.107.188 "cd /home/test.tunalgo.com/public_html && php artisan migrate --force"
+          sshpass -p ${{ secrets.SERVER_PASSWORD }} ssh root@51.210.107.188 "cd /home/test.tunalgo.com/public_html && php artisan migrate --force"
 
       - name: Reload PHP-FPM or Web Server (adjust based on your server)
-        if: github.ref == 'refs/heads/main'
         run: |
           echo "Using password for authentication"
-          sshpass -p ${{ secrets.SERVER_PASSWORD }} ssh user@51.210.107.188 "sudo service php8.0-fpm reload"
+          sshpass -p ${{ secrets.SERVER_PASSWORD }} ssh root@51.210.107.188 "sudo service php8.0-fpm reload"
