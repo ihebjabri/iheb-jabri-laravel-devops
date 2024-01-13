@@ -49,14 +49,14 @@ jobs:
       - name: Install Dependencies on Server
         run: |
           echo "Using password for authentication"
-          sshpass -p ${{ secrets.SERVER_PASSWORD }} ssh root@51.210.107.188 "cd /home/test.tunalgo.com/public_html && composer install --no-dev --prefer-dist --optimize-autoloader"
+          sshpass -p ${{ secrets.SERVER_PASSWORD }} ssh -p 222 root@51.210.107.188 "cd /home/test.tunalgo.com/public_html && composer install --no-dev --prefer-dist --optimize-autoloader"
 
       - name: Migrate Database on Server
         run: |
           echo "Using password for authentication"
-          sshpass -p ${{ secrets.SERVER_PASSWORD }} ssh root@51.210.107.188 "cd /home/test.tunalgo.com/public_html && php artisan migrate --force"
+          sshpass -p ${{ secrets.SERVER_PASSWORD }} ssh -p 222 root@51.210.107.188 "cd /home/test.tunalgo.com/public_html && php artisan migrate --force"
 
       - name: Reload PHP-FPM or Web Server (adjust based on your server)
         run: |
           echo "Using password for authentication"
-          sshpass -p ${{ secrets.SERVER_PASSWORD }} ssh root@51.210.107.188 "sudo service php8.0-fpm reload"
+          sshpass -p ${{ secrets.SERVER_PASSWORD }} ssh -p 222 root@51.210.107.188 "sudo service php8.0-fpm reload"
