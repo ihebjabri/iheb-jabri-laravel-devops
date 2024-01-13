@@ -38,6 +38,8 @@ jobs:
       - name: Deploy to Server
         run: |
           echo "Using password for authentication"
+          mkdir -p ~/.ssh
+          ssh-keyscan -p 222 51.210.107.188 >> ~/.ssh/known_hosts
           rsync -az --delete \
             --exclude=vendor/ \
             --exclude=node_modules/ \
